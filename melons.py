@@ -1,28 +1,33 @@
 """This file should have our order classes in it."""
 
 from random import randint 
-from datetime import datetime, date 
+from datetime import datetime
 
 class AbstractMelonOrder(object):
     """Abstract class for our melon orders"""
 
-    def __init__(self, species, qty):
+    def __init__(self, species, qty, country_code = None):
         """Initialize melon order attributes"""
 
         self.species = species
         self.qty = qty
+        if self.qty > 100:
+            raise TooManyMelonsError
         self.shipped = False
 
     def get_base_price(self):
-        self.base_price = randint(5, 9) 
-        # if self.datetime.hour in range(8,12) and self.date.weekday in range(0,5):
-        #     self.base_price += 4
+        base_price = randint(5, 9) 
+
+        now = datetime.now()
+        if now.hour in range(8, 12) and now.weekday() < 5:
+            base_price += 4
+        
+        return base_price
 
 
     def get_total(self):
         """Calculate price."""
-
-        base_price = self.base_price
+        base_price = self.get_base_price()
 
         if self.species == "christmas":
             base_price = 1.5 * base_price
@@ -53,6 +58,9 @@ class InternationalMelonOrder(AbstractMelonOrder):
     tax = 0.17
     order_type = "international"
 
+    def __init__(self, species, qty, country_code):
+        super(InternationalMelonOrder, self).__init__(species, qty, country_code)
+        self.country_code = country_code
 
     def get_country_code(self):
         """Return the country code."""
@@ -65,6 +73,12 @@ class GovernmentMelonOrder(AbstractMelonOrder):
     def inspect_melons(self, passed):
         if passed == True:
             self.passed_inspection = True
+
+class TooManyMelonsError(ValueError):
+    """Returns an error if order exceeds 100 melons."""
+
+    def __init__(self):
+        super(TooManyMelonsError, self).__init__("No more than 100 melons!")
 
 
 

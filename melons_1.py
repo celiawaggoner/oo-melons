@@ -22,15 +22,14 @@ class AbstractMelonOrder(object):
     def get_total(self):
         """Calculate price."""
 
-        base_price = self.base_price
 
         if self.species == "christmas":
-            base_price = 1.5 * base_price
+            self.base_price = 1.5 * self.base_price
 
         if self.qty < 10 and self.order_type == "international":
-            total = (1 + self.tax) * self.qty * base_price + 3
+            total = (1 + self.tax) * self.qty * self.base_price + 3
         else:
-            total = (1 + self.tax) * self.qty * base_price
+            total = (1 + self.tax) * self.qty * self.base_price
         return total
 
     def mark_shipped(self):
